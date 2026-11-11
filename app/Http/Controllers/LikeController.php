@@ -28,6 +28,6 @@ class LikeController extends Controller
             ]);
         }
 
-        return back(); // Refresh halaman feed
+        return redirect()->to(url()->previous() . '#post-' . $postId); // Refresh halaman feed
     }
 }

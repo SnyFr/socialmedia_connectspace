@@ -29,6 +29,6 @@ class CommentController extends Controller
             'image'   => $imagePath,
         ]);
 
-        return back()->with('success', 'Komentar terkirim!');
+        return redirect()->to(url()->previous() . '#post-' . $postId);
     }
 }
