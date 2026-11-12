@@ -14,72 +14,37 @@
     <!-- Custom Styling Theme (X / Threads Inspired - Slate & Dark Mode) -->
     <style>
         :root {
-            --bg-body: #0f172a;
-            /* Background utama: Deep Dark Slate */
-            --bg-card: #1e293b;
-            /* Background card/post: Dark Slate */
-            --bg-card-hover: #334155;
-            /* Warna hover item */
-            --border-color: #334155;
-            /* Warna border tipis */
-            --text-main: #f8fafc;
-            /* Warna teks utama (Off-White) */
-            --text-muted: #94a3b8;
-            /* Warna teks sekunder (Slate Gray) */
-            --accent-color: #38bdf8;
-            /* Warna aksen utama (Sky Blue / X Accent) */
-            --accent-hover: #0284c7;
+            --bg-main: #09090b;
+            /* Hitam charcoal khas Laravel Welcome Dark */
+            --bg-surface: #18181b;
+            /* Warna card (Zinc 900) */
+            --bg-input: #121215;
+            /* Warna input & box komentar */
+            --accent-color: #FF2D20;
+            /* Merah ikonik Laravel */
+            --accent-hover: #dc2626;
+            /* Merah lebih gelap saat hover */
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
         }
 
         body {
-            background-color: var(--bg-body);
+            background-color: var(--bg-main);
             color: var(--text-main);
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        /* Custom Cards & Navbar */
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 16px;
-        }
-
-        .card-header,
-        .card-footer {
-            background-color: transparent;
-            border-color: var(--border-color);
-        }
-
-        .form-control {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 10px;
-        }
-
-        .form-control:focus {
-            background-color: #0f172a;
-            color: var(--text-main);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
-        }
-
-        .form-control::placeholder {
-            color: var(--text-muted);
-        }
-
-        /* Sidebar Nav Styles */
+        /* Sidebar & Topbar */
         .sidebar {
             position: sticky;
             top: 0;
             height: 100vh;
-            border-right: 1px solid var(--border-color);
             padding: 1.5rem 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            background-color: #0c0c0e;
         }
 
         .sidebar-brand {
@@ -87,7 +52,7 @@
             font-weight: 800;
             color: var(--accent-color);
             text-decoration: none;
-            padding: 0.5rem 0.5rem;
+            padding: 0.5rem;
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
@@ -107,27 +72,62 @@
             align-items: center;
             gap: 0.75rem;
             text-decoration: none;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
             margin-bottom: 0.35rem;
             white-space: nowrap;
         }
 
-        .nav-link-custom:hover,
-        .nav-link-custom.active {
-            background-color: var(--bg-card-hover);
+        .nav-link-custom:hover {
+            background-color: rgba(255, 45, 32, 0.1);
             color: var(--accent-color);
         }
 
-        .btn-accent {
-            background-color: var(--accent-color);
-            color: #0f172a;
-            font-weight: 700;
-            border-radius: 30px;
-            border: none;
-            padding: 0.6rem 1.2rem;
+        .nav-link-custom.active {
+            background-color: rgba(255, 45, 32, 0.15);
+            color: var(--accent-color);
         }
 
-        .btn-accent:hover {
+        /* Card & Form Surface */
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+
+        .card-header,
+        .card-footer {
+            background-color: transparent !important;
+        }
+
+        .form-control {
+            background-color: var(--bg-input);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-main);
+        }
+
+        .form-control:focus {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(255, 45, 32, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #71717a;
+        }
+
+        /* Tombol Utama (Laravel Red) */
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+            border-radius: 25px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-accent:hover,
+        .btn-accent:focus {
             background-color: var(--accent-hover);
             color: #ffffff;
         }
@@ -136,6 +136,21 @@
             color: var(--text-muted) !important;
         }
 
+        /* Override Otomatis Class Biru (text-info & inline dark blue) Tanpa Edit File Lain */
+        .text-info {
+            color: var(--accent-color) !important;
+        }
+
+        [style*="background-color: #0b1120"] {
+            background-color: #0c0c0e !important;
+        }
+
+        [style*="background-color: #0f172a"],
+        [style*="background-color: #090d16"] {
+            background-color: var(--bg-input) !important;
+        }
+
+        /* Responsif Tablet / Laptop Kecil */
         @media (min-width: 768px) and (max-width: 1199.98px) {
             .sidebar-brand {
                 font-size: 1.1rem;
@@ -155,7 +170,7 @@
 <body>
 
     @auth
-        <!-- LAYOUT TERPISAH DENGAN SIDEBAR UNTUK USER LOGIN (X/Threads Style) -->
+        <!-- LAYOUT TERPISAH DENGAN SIDEBAR UNTUK USER LOGIN  -->
         <div class="container-fluid">
             <div class="row">
                 <!-- Sidebar Kiri -->
@@ -187,7 +202,7 @@
                         <div class="pt-3 border-top border-secondary">
                             <div class="d-flex align-items-center justify-content-between mb-3 px-2">
                                 <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=38bdf8&color=0f172a' }}"
+                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
                                         class="rounded-circle border border-secondary" width="40" height="40"
                                         style="object-fit: cover;" alt="Avatar">
                                     <div class="lh-1">
@@ -224,7 +239,7 @@
                             <!-- 2. Avatar Profil (Bisa Diklik -> Ke Edit Profil) -->
                             <a href="{{ route('profile.edit') }}" title="Profil Saya"
                                 class="d-flex align-items-center text-decoration-none">
-                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=38bdf8&color=0f172a' }}"
+                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
                                     class="rounded-circle border border-secondary border-opacity-25" width="35"
                                     height="35" style="object-fit: cover;">
                             </a>
@@ -290,34 +305,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cari elemen alert success di halaman
-            const successAlert = document.querySelector('.alert-success');
+    // 1. Matikan scroll restoration bawaan browser agar tidak loncat/flicker saat reload
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
 
-            if (successAlert) {
-                // JALANKAN TIMEOUT (3000ms = 3 detik)
-                setTimeout(function() {
-                    // Gunakan API Bootstrap Alert untuk menutup alert secara halus
-                    const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
-                    alert.close();
-                }, 3000);
+        // 2. Tangkap posisi scroll persis saat form disubmit
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            const actionPath = new URL(form.action).pathname;
+            const spoofedMethod = form.querySelector('input[name="_method"]')?.value?.toUpperCase();
+            const actualMethod = spoofedMethod || form.method.toUpperCase();
+
+            // Cek apakah aksi ini adalah membuat POSTINGAN BARU (POST murni ke /posts)
+            const isNewPost = (actionPath === '/posts' && actualMethod === 'POST');
+
+            if (isNewPost) {
+                // Jika posting status baru, biarkan layar kembali ke paling atas
+                sessionStorage.removeItem('scrollPosition');
+            } else {
+                // Untuk Like, Komentar, Edit, dan Hapus: simpan titik scroll layar saat ini
+                sessionStorage.setItem('scrollPosition', window.scrollY);
             }
         });
 
-        // Simpan posisi scroll ke sessionStorage saat pengguna submit form apa pun
-        document.addEventListener('submit', function() {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
-        });
+        // 3. Kembalikan posisi scroll secara instan tanpa mengarahkan ke card tertentu
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedScroll = sessionStorage.getItem('scrollPosition');
+            if (savedScroll !== null) {
+                const targetY = parseInt(savedScroll, 10);
+                sessionStorage.removeItem('scrollPosition'); // Langsung bersihkan agar tidak terbawa ke halaman lain
 
-        // Saat halaman selesai di-reload, kembalikan posisi scroll ke koordinat semula
-        document.addEventListener('DOMContentLoaded', function() {
-            const scrollPosition = sessionStorage.getItem('scrollPosition');
-            if (scrollPosition !== null) {
-                window.scrollTo({
-                    top: parseInt(scrollPosition),
-                    behavior: 'instant' // Memindahkan layar secara instan tanpa animasi mengambang
-                });
-                sessionStorage.removeItem('scrollPosition'); // Hapus memori setelah digunakan
+                // Pindahkan layar langsung ke koordinat semula sebelum user melihat kedipan
+                window.scrollTo({ top: targetY, behavior: 'instant' });
+
+                // Kunci ulang setelah gambar selesai dimuat agar tinggi gambar tidak menggeser posisi scroll
+                window.addEventListener('load', function () {
+                    window.scrollTo({ top: targetY, behavior: 'instant' });
+                }, { once: true });
             }
         });
     </script>

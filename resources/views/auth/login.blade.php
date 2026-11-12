@@ -6,7 +6,7 @@
         <div class="card shadow-lg border border-secondary border-opacity-25">
             <!-- Header Card -->
             <div class="card-header border-secondary border-opacity-25 text-center py-4">
-                <i class="bi bi-chat-square-quote-fill text-info fs-1 mb-2 d-block"></i>
+                <i class="bi bi-strava text-info fs-1 mb-2 d-block"></i>
                 <h4 class="mb-0 fw-bold text-white">Login ConnectSpace</h4>
                 <small class="text-muted-custom">Masukkan akun untuk masuk ke beranda</small>
             </div>
@@ -29,6 +29,9 @@
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-white">Password</label>
                         <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- Tombol Login -->

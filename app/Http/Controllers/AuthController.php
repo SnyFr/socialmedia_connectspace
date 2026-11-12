@@ -62,13 +62,13 @@ class AuthController extends Controller
             // Mencegah serangan Session Fixation
             $request->session()->regenerate();
 
-            return redirect()->intended(route('feed.index'))->with('success', 'Berhasil login!');
+            return redirect()->intended(route('feed.index'))->with('success', 'Login Sukses!');
         }
 
         // Jika kombinasi email & password salah
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        ])->onlyInput('email', 'password');
     }
 
     // Memproses Logout

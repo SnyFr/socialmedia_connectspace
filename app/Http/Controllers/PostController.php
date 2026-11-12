@@ -50,6 +50,54 @@ class PostController extends Controller
         return back()->with('success', 'Status berhasil dipublikasikan!');
     }
 
+    // Memproses Edit Status (Hanya Pemilik Post)
+    public function update(Request $request, string $id)
+    {
+        $post = Post::findOrFail($id);
+
+        // 1. OTORISASI: Pastikan hanya pemilik post yang bisa mengedit
+        if ($post->user_id !== Auth::id()) {
+            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengedit postingan ini!');
+        }
+
+        // 2. Validasi: Cek apakah gambar lama dipertahankan atau dihapus
+        $hasExistingImage = $post->image && !$request->boolean('remove_image');
+
+        $request->validate([
+            'content' => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string',
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ], [
+            'content.required_without' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
+            'image.max'                => 'Ukuran gambar maksimal 2MB.',
+        ]);
+
+        $imagePath = $post->image;
+
+        // Jika user mencentang hapus gambar lama
+        if ($request->boolean('remove_image') && $post->image) {
+            if (Storage::disk('public')->exists($post->image)) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $imagePath = null;
+        }
+
+        // Jika user mengunggah gambar baru (timpa gambar lama)
+        if ($request->hasFile('image')) {
+            if ($post->image && Storage::disk('public')->exists($post->image)) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $imagePath = $request->file('image')->store('posts', 'public');
+        }
+
+        // 3. Update data ke database
+        $post->update([
+            'content' => $request->input('content'),
+            'image'   => $imagePath,
+        ]);
+
+        return back()->with('success', 'Postingan berhasil diupdate!');
+    }
+
     // 3. Memproses Hapus Status (Otorisasi Pemilik)
     public function destroy(string $id)
     {

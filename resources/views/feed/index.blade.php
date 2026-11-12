@@ -3,6 +3,9 @@
 @section('content')
     <div class="row justify-content-center">
         <div class="col-lg-10">
+            <h4 class="fw-bold mb-4 text-white">
+                <i class="bi bi-house-door-fill me-2 text-info"></i>Beranda
+            </h4>
 
             <!-- FORM BUAT POSTINGAN BARU -->
             <div class="card shadow-sm mb-4">
@@ -10,9 +13,9 @@
                     <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="d-flex gap-3 align-items-start">
-                            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=38bdf8&color=0f172a' }}"
-                                class="rounded-circle border border-secondary border-opacity-25 flex-shrink-0" width="40"
-                                height="40" style="width: 40px; height: 40px; object-fit: cover;">
+                            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
+                                class="rounded-circle border border-secondary border-opacity-25 flex-shrink-0"
+                                width="40" height="40" style="width: 40px; height: 40px; object-fit: cover;">
 
                             <div class="w-100">
                                 <!-- Input Teks Status -->
@@ -59,16 +62,16 @@
                         <!-- Header Post: Foto, Nama, Waktu, & Dropdown Menu Dots 3 -->
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div class="d-flex gap-2 align-items-center">
-                                <img src="{{ $post->user->avatar ? asset('storage/' . $post->user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) . '&background=38bdf8&color=0f172a' }}"
-                                    class="rounded-circle border border-secondary border-opacity-25" width="40"
-                                    height="40" style="object-fit: cover;">
+                                <img src="{{ $post->user->avatar ? asset('storage/' . $post->user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) . '&background=FF2D20&color=ffffff' }}"
+                                    class="rounded-circle border border-secondary border-opacity-25 flex-shrink-0"
+                                    width="40" height="40" style="width: 40px; height: 40px; object-fit: cover;">
                                 <div>
                                     <h6 class="mb-0 fw-bold text-white fs-6">{{ $post->user->name }}</h6>
                                     <small class="text-muted-custom">{{ $post->created_at->diffForHumans() }}</small>
                                 </div>
                             </div>
 
-                            <!-- Menu Dots 3 (Hanya untuk pemilik post) -->
+                            <!-- Menu Dots 3 Postingan (Hanya Pemilik Post) -->
                             @if (Auth::id() === $post->user_id)
                                 <div class="dropdown">
                                     <button class="btn btn-link text-muted-custom p-0 border-0" type="button"
@@ -77,6 +80,16 @@
                                     </button>
                                     <ul
                                         class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-secondary border-opacity-25">
+                                        <li>
+                                            <button type="button"
+                                                class="dropdown-item text-light d-flex align-items-center gap-2"
+                                                data-bs-toggle="modal" data-bs-target="#editPostModal-{{ $post->id }}">
+                                                <i class="bi bi-pencil-square text-info"></i> Edit Feed
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider border-secondary border-opacity-25">
+                                        </li>
                                         <li>
                                             <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
                                                 onsubmit="return confirm('Yakin ingin menghapus postingan ini?')">
@@ -107,7 +120,7 @@
                             </div>
                         @endif
 
-                        <!-- Tombol Action: Like & Komentar (Garis Muted Border-Opacity-25) -->
+                        <!-- Tombol Action: Like & Komentar -->
                         <div
                             class="d-flex align-items-center gap-4 py-2 border-top border-bottom border-secondary border-opacity-25">
                             <form action="{{ route('posts.like', $post->id) }}" method="POST"
@@ -131,19 +144,19 @@
 
                         <!-- AREA KOMENTAR -->
                         <div class="mt-3">
-                            <!-- Form Komentar (Attachment Icon di Dalam Input Group) -->
+                            <!-- Form Tulis Komentar -->
                             <form action="{{ route('comments.store', $post->id) }}" method="POST"
                                 enctype="multipart/form-data" class="mb-3">
                                 @csrf
                                 <div class="d-flex gap-2 align-items-start">
-                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=38bdf8&color=0f172a' }}"
-                                        class="rounded-circle" width="32" height="32" style="object-fit: cover;">
+                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
+                                        class="rounded-circle flex-shrink-0" width="32" height="32"
+                                        style="width: 32px; height: 32px; object-fit: cover;">
                                     <div class="w-100">
                                         <div class="input-group input-group-sm">
                                             <input type="text" name="comment" class="form-control"
                                                 placeholder="Tulis komentar...">
 
-                                            <!-- Icon Attachment tanpa teks -->
                                             <label
                                                 class="btn btn-outline-secondary border-secondary border-opacity-25 text-muted-custom d-flex align-items-center px-2 cursor-pointer"
                                                 title="Lampirkan Gambar">
@@ -157,7 +170,7 @@
                                             <button class="btn btn-accent px-3 fw-bold" type="submit">Kirim</button>
                                         </div>
 
-                                        <!-- Indicator Preview Gambar Komentar (Muted Border) -->
+                                        <!-- Preview Gambar Komentar -->
                                         <div id="commentPreviewContainer-{{ $post->id }}"
                                             class="mt-2 d-none position-relative d-inline-block">
                                             <img id="commentPreviewImg-{{ $post->id }}" src=""
@@ -176,14 +189,56 @@
 
                             <!-- List Komentar -->
                             @foreach ($post->comments as $comment)
-                                <div class="d-flex gap-2 mb-2 p-2 rounded-3" style="background-color: #0f172a;">
-                                    <img src="{{ $comment->user->avatar ? asset('storage/' . $comment->user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) . '&background=38bdf8&color=0f172a' }}"
-                                        class="rounded-circle" width="30" height="30" style="object-fit: cover;">
+                                <div class="d-flex gap-2 mb-2 p-2 rounded-3" style="background-color: #121215;">
+                                    <img src="{{ $comment->user->avatar ? asset('storage/' . $comment->user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) . '&background=FF2D20&color=ffffff' }}"
+                                        class="rounded-circle flex-shrink-0" width="30" height="30"
+                                        style="width: 30px; height: 30px; object-fit: cover;">
                                     <div class="w-100">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-white small">{{ $comment->user->name }}</span>
-                                            <small class="text-muted-custom"
-                                                style="font-size: 0.75rem;">{{ $comment->created_at->diffForHumans() }}</small>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-bold text-white small">{{ $comment->user->name }}</span>
+                                                <small class="text-muted-custom"
+                                                    style="font-size: 0.72rem;">{{ $comment->created_at->diffForHumans() }}</small>
+                                            </div>
+
+                                            <!-- Menu Aksi Komentar: Muncul untuk Pemilik Komentar ATAU Pemilik Post -->
+                                            @if (Auth::id() === $comment->user_id)
+                                                <div class="dropdown">
+                                                    <button class="btn btn-link text-muted-custom p-0 border-0"
+                                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots small"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-secondary border-opacity-25"
+                                                        style="font-size: 0.85rem;">
+                                                        <li>
+                                                            <button type="button"
+                                                                class="dropdown-item text-light d-flex align-items-center gap-2"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editCommentModal-{{ $comment->id }}">
+                                                                <i class="bi bi-pencil-square text-info"></i> Edit Komentar
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <hr
+                                                                class="dropdown-divider border-secondary border-opacity-25">
+                                                        </li>
+                                                        <li>
+                                                            <form action="{{ route('comments.destroy', $comment->id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Yakin ingin menghapus komentar ini?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit"
+                                                                    class="dropdown-item text-danger d-flex align-items-center gap-2">
+                                                                    <i class="bi bi-trash"></i> Hapus Komentar
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            @endif
+
+                                            <!-- Hapus: Pemilik Komentar ATAU Pemilik Postingan -->
                                         </div>
 
                                         @if ($comment->comment)
@@ -197,11 +252,130 @@
                                         @endif
                                     </div>
                                 </div>
+
+                                <!-- MODAL EDIT KOMENTAR (Khusus Pemilik Komentar) -->
+                                @if (Auth::id() === $comment->user_id)
+                                    <div class="modal fade" id="editCommentModal-{{ $comment->id }}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content text-light border border-secondary border-opacity-25"
+                                                style="background-color: #18181b;">
+                                                <div class="modal-header border-secondary border-opacity-25">
+                                                    <h6 class="modal-title fw-bold">Edit Komentar</h6>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{ route('comments.update', $comment->id) }}"
+                                                    method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-semibold">Isi
+                                                                Komentar</label>
+                                                            <textarea name="comment" rows="2" class="form-control">{{ $comment->comment }}</textarea>
+                                                        </div>
+
+                                                        @if ($comment->image)
+                                                            <div class="mb-3 p-2 rounded border border-secondary border-opacity-25"
+                                                                style="background-color: #121215;">
+                                                                <small class="text-muted-custom d-block mb-2">Gambar saat
+                                                                    ini:</small>
+                                                                <img src="{{ asset('storage/' . $comment->image) }}"
+                                                                    class="img-fluid rounded mb-2"
+                                                                    style="max-height: 120px;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="remove_image" value="1"
+                                                                        id="removeCommentImg-{{ $comment->id }}">
+                                                                    <label class="form-check-label small text-danger"
+                                                                        for="removeCommentImg-{{ $comment->id }}">
+                                                                        Hapus gambar ini
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+
+                                                        <div>
+                                                            <label
+                                                                class="form-label small fw-semibold">{{ $comment->image ? 'Ganti Gambar (Opsional)' : 'Lampirkan Gambar (Opsional)' }}</label>
+                                                            <input type="file" name="image"
+                                                                class="form-control form-control-sm" accept="image/*">
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-secondary border-opacity-25">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                            data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-sm btn-accent px-4">Simpan
+                                                            Perubahan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
 
                     </div>
                 </div>
+
+                <!-- MODAL EDIT POSTINGAN (Khusus Pemilik Post) -->
+                @if (Auth::id() === $post->user_id)
+                    <div class="modal fade" id="editPostModal-{{ $post->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content text-light border border-secondary border-opacity-25"
+                                style="background-color: #18181b;">
+                                <div class="modal-header border-secondary border-opacity-25">
+                                    <h5 class="modal-title fw-bold">Edit Postingan</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form action="{{ route('posts.update', $post->id) }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-semibold">Konten Status</label>
+                                            <textarea name="content" rows="4" class="form-control" placeholder="Apa yang sedang terjadi?">{{ $post->content }}</textarea>
+                                        </div>
+
+                                        @if ($post->image)
+                                            <div class="mb-3 p-2 rounded border border-secondary border-opacity-25"
+                                                style="background-color: #121215;">
+                                                <small class="text-muted-custom d-block mb-2">Gambar saat ini:</small>
+                                                <img src="{{ asset('storage/' . $post->image) }}"
+                                                    class="img-fluid rounded mb-2" style="max-height: 180px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="remove_image"
+                                                        value="1" id="removePostImg-{{ $post->id }}">
+                                                    <label class="form-check-label small text-danger"
+                                                        for="removePostImg-{{ $post->id }}">
+                                                        Hapus gambar dari postingan
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div>
+                                            <label
+                                                class="form-label small fw-semibold">{{ $post->image ? 'Ganti Gambar Baru (Opsional)' : 'Tambah Gambar (Opsional)' }}</label>
+                                            <input type="file" name="image" class="form-control form-control-sm"
+                                                accept="image/*">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-secondary border-opacity-25">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-sm btn-accent px-4">Simpan
+                                            Perubahan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             @empty
                 <div class="text-center py-5 text-muted-custom">
                     <i class="bi bi-chat-left-dots fs-1 d-block mb-2"></i>
