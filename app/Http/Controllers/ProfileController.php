@@ -40,18 +40,19 @@ class ProfileController extends Controller
             'bio'  => $request->bio,
         ];
 
-        // Logika Upload Berkas Gambar Avatar
-        if ($request->hasFile('avatar')) {
-            // Hapus berkas avatar lama di storage jika ada
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
-            }
+        $oldAvatar = $user->avatar;
 
-            // Simpan gambar baru ke folder storage/app/public/avatars
+        if ($request->hasFile('avatar')) {
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        } elseif ($request->boolean('remove_avatar')) {
+            $data['avatar'] = null;
         }
 
         $user->update($data);
+
+        if ($oldAvatar && $oldAvatar !== $user->avatar && Storage::disk('public')->exists($oldAvatar)) {
+            Storage::disk('public')->delete($oldAvatar);
+        }
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }

@@ -305,6 +305,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.alert').forEach(function (alert) {
+                window.setTimeout(function () {
+                    bootstrap.Alert.getOrCreateInstance(alert).close();
+                }, 2000);
+            });
+        });
+
     // 1. Matikan scroll restoration bawaan browser agar tidak loncat/flicker saat reload
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
@@ -325,7 +333,10 @@
                 sessionStorage.removeItem('scrollPosition');
             } else {
                 // Untuk Like, Komentar, Edit, dan Hapus: simpan titik scroll layar saat ini
-                sessionStorage.setItem('scrollPosition', window.scrollY);
+                sessionStorage.setItem('scrollPosition', JSON.stringify({
+                    path: window.location.pathname,
+                    y: window.scrollY
+                }));
             }
         });
 
@@ -333,8 +344,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             const savedScroll = sessionStorage.getItem('scrollPosition');
             if (savedScroll !== null) {
-                const targetY = parseInt(savedScroll, 10);
-                sessionStorage.removeItem('scrollPosition'); // Langsung bersihkan agar tidak terbawa ke halaman lain
+                sessionStorage.removeItem('scrollPosition');
+                const position = JSON.parse(savedScroll);
+                if (position.path !== window.location.pathname || !Number.isFinite(position.y)) {
+                    return;
+                }
+
+                const targetY = position.y;
 
                 // Pindahkan layar langsung ke koordinat semula sebelum user melihat kedipan
                 window.scrollTo({ top: targetY, behavior: 'instant' });
@@ -344,6 +360,7 @@
                     window.scrollTo({ top: targetY, behavior: 'instant' });
                 }, { once: true });
             }
+
         });
     </script>
 </body>

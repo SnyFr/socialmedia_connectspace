@@ -92,7 +92,7 @@
                                         </li>
                                         <li>
                                             <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus postingan ini?')">
+                                                data-delete-confirm="Yakin ingin menghapus postingan ini?">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -127,18 +127,18 @@
                                 class="d-flex align-items-center m-0">
                                 @csrf
                                 @php
-                                    $isLiked = $post->likes->contains('user_id', Auth::id());
+                                    $isLiked = $post->liked_by_user;
                                 @endphp
                                 <button type="submit"
                                     class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 {{ $isLiked ? 'text-danger' : 'text-muted-custom' }} fw-semibold small">
                                     <i class="bi {{ $isLiked ? 'bi-heart-fill' : 'bi-heart' }} fs-6"></i>
-                                    <span>{{ $post->likes->count() }} Like</span>
+                                    <span>{{ $post->likes_count }} Like</span>
                                 </button>
                             </form>
 
                             <div class="d-flex align-items-center gap-1 text-muted-custom fw-semibold small">
                                 <i class="bi bi-chat fs-6"></i>
-                                <span>{{ $post->comments->count() }} Komentar</span>
+                                <span>{{ $post->comments_count }} Komentar</span>
                             </div>
                         </div>
 
@@ -225,7 +225,7 @@
                                                         <li>
                                                             <form action="{{ route('comments.destroy', $comment->id) }}"
                                                                 method="POST"
-                                                                onsubmit="return confirm('Yakin ingin menghapus komentar ini?')">
+                                                                data-delete-confirm="Yakin ingin menghapus komentar ini?">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit"
@@ -386,8 +386,98 @@
         </div>
     </div>
 
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-light border border-secondary border-opacity-25"
+                style="background-color: #18181b;">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <h5 class="modal-title fw-bold" id="deleteConfirmTitle">Konfirmasi penghapusan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" id="deleteConfirmMessage"></div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="confirmDeleteButton">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let pendingDeleteForm = null;
+        const deleteConfirmModalElement = document.getElementById('deleteConfirmModal');
+        let deleteConfirmModal = null;
+
+        function getDeleteConfirmModal() {
+            if (!deleteConfirmModal && window.bootstrap?.Modal) {
+                deleteConfirmModal = new window.bootstrap.Modal(deleteConfirmModalElement);
+            }
+
+            return deleteConfirmModal;
+        }
+
+        function submitConfirmedDelete(form) {
+            sessionStorage.setItem('scrollPosition', JSON.stringify({
+                path: window.location.pathname,
+                y: window.scrollY
+            }));
+            form.submit();
+        }
+
+        document.addEventListener('submit', function (event) {
+            const form = event.target;
+            if (!form.matches('form[data-delete-confirm]')) {
+                return;
+            }
+
+            event.preventDefault();
+            const modal = getDeleteConfirmModal();
+            if (!modal) {
+                if (window.confirm(form.dataset.deleteConfirm)) {
+                    submitConfirmedDelete(form);
+                }
+                return;
+            }
+
+            pendingDeleteForm = form;
+            document.getElementById('deleteConfirmMessage').textContent = form.dataset.deleteConfirm;
+            modal.show();
+        });
+
+        document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+            const modal = getDeleteConfirmModal();
+            if (pendingDeleteForm && modal) {
+                submitConfirmedDelete(pendingDeleteForm);
+                pendingDeleteForm = null;
+            }
+            modal?.hide();
+        });
+
+        deleteConfirmModalElement.addEventListener('hidden.bs.modal', function () {
+            pendingDeleteForm = null;
+        });
+
         // 1. Function untuk menampilkan preview saat gambar dipilih
+        function setImagePreview(preview, file) {
+            if (preview.dataset.objectUrl) {
+                URL.revokeObjectURL(preview.dataset.objectUrl);
+            }
+
+            preview.dataset.objectUrl = URL.createObjectURL(file);
+            preview.src = preview.dataset.objectUrl;
+        }
+
+        function clearImagePreview(preview) {
+            if (preview.dataset.objectUrl) {
+                URL.revokeObjectURL(preview.dataset.objectUrl);
+                delete preview.dataset.objectUrl;
+            }
+
+            preview.removeAttribute('src');
+        }
+
         function previewPostImage(event) {
             const input = event.target; // Mengambil elemen <input type="file"> yang memicu event
             const container = document.getElementById('imagePreviewContainer'); // Container preview
@@ -399,7 +489,7 @@
                 const file = input.files[0];
 
                 // URL.createObjectURL membuat URL sementara di memori browser dari berkas lokal
-                preview.src = URL.createObjectURL(file);
+                setImagePreview(preview, file);
 
                 // Tampilkan container preview dengan menghapus class Bootstrap 'd-none'
                 container.classList.remove('d-none');
@@ -420,7 +510,7 @@
 
             // Reset nilai input file agar berkas tidak ter-upload ke server saat form disubmit
             input.value = '';
-            preview.src = '';
+            clearImagePreview(preview);
 
             // Sembunyikan kembali container preview dengan menambahkan class 'd-none'
             container.classList.add('d-none');
@@ -438,7 +528,7 @@
             const preview = document.getElementById(`commentPreviewImg-${postId}`);
 
             if (input.files && input.files[0]) {
-                preview.src = URL.createObjectURL(input.files[0]);
+                setImagePreview(preview, input.files[0]);
                 container.classList.remove('d-none');
             }
         }
@@ -449,7 +539,7 @@
             const preview = document.getElementById(`commentPreviewImg-${postId}`);
 
             input.value = '';
-            preview.src = '';
+            clearImagePreview(preview);
             container.classList.add('d-none');
         }
     </script>

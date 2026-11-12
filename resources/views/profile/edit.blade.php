@@ -30,6 +30,15 @@
                                 <input type="file" name="avatar"
                                     class="form-control @error('avatar') is-invalid @enderror" accept="image/*">
                                 <small class="text-muted-custom">Format: JPG, PNG, WEBP (Maksimal 2MB)</small>
+                                {{-- @if ($user->avatar)
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="remove_avatar"
+                                            value="1" id="removeAvatar">
+                                        <label class="form-check-label small text-danger" for="removeAvatar">
+                                            Hapus foto profil
+                                        </label>
+                                    </div>
+                                @endif --}}
                                 @error('avatar')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -100,7 +109,7 @@
                                 placeholder="Ulangi password baru">
                         </div>
 
-                        <button type="submit" class="btn btn-outline-warning rounded-pill px-4 fw-bold">Update
+                        <button type="submit" class="btn btn-accent rounded-pill px-4 fw-bold">Update
                             Password</button>
                     </form>
                 </div>

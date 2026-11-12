@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostController extends Controller
 {
@@ -14,9 +15,13 @@ class PostController extends Controller
     {
         // Ambil postingan terbaru (latest = created_at DESC)
         // Eager Loading (with) digunakan untuk mencegah masalah N+1 Query
-        $posts = Post::with(['user', 'likes', 'comments.user'])
-                    ->latest()
-                    ->get();
+        $posts = Post::with(['user', 'comments.user'])
+            ->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes as liked_by_user' => fn ($query) => $query->where('user_id', Auth::id()),
+            ])
+            ->latest()
+            ->get();
 
         return view('feed.index', compact('posts'));
     }
@@ -57,7 +62,7 @@ class PostController extends Controller
 
         // 1. OTORISASI: Pastikan hanya pemilik post yang bisa mengedit
         if ($post->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengedit postingan ini!');
+            throw new HttpException(403);
         }
 
         // 2. Validasi: Cek apakah gambar lama dipertahankan atau dihapus
@@ -105,12 +110,22 @@ class PostController extends Controller
 
         // OTORISASI UJK: Cek apakah yang menghapus adalah pemilik asli post
         if ($post->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk menghapus postingan ini!');
+            throw new HttpException(403);
         }
 
-        // Hapus berkas gambar dari storage jika post memiliki gambar
+        $commentImages = $post->comments()
+            ->whereNotNull('image')
+            ->pluck('image');
+
+        // Hapus gambar post dan komentar sebelum record komentar di-cascade oleh database.
         if ($post->image && Storage::disk('public')->exists($post->image)) {
             Storage::disk('public')->delete($post->image);
+        }
+
+        foreach ($commentImages as $image) {
+            if (Storage::disk('public')->exists($image)) {
+                Storage::disk('public')->delete($image);
+            }
         }
 
         $post->delete();

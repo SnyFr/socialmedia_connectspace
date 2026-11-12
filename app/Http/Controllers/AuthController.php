@@ -54,7 +54,7 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'email'    => 'required|email',
-            'password' => 'required',
+            'password' => 'required|min:6',
         ]);
 
         // memverifikasi password terenkripsi di DB secara otomatis
@@ -68,6 +68,7 @@ class AuthController extends Controller
         // Jika kombinasi email & password salah
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
+            'password' => 'Email atau password yang Anda masukkan salah.',
         ])->onlyInput('email', 'password');
     }
 

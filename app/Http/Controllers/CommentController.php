@@ -6,6 +6,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommentController extends Controller
 {
@@ -39,7 +40,7 @@ class CommentController extends Controller
 
         // 1. OTORISASI: Hanya pemilik komentar yang bisa mengedit
         if ($comment->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengedit komentar ini!');
+            throw new HttpException(403);
         }
 
         $hasExistingImage = $comment->image && !$request->boolean('remove_image');
@@ -72,7 +73,7 @@ class CommentController extends Controller
             'image'   => $imagePath,
         ]);
 
-        return back()->with('success', 'Komentar berhasil diudpate!');
+        return back()->with('success', 'Komentar berhasil diperbarui!');
     }
 
     // Memproses Hapus Komentar (Hanya Pemilik Komentar)
@@ -82,7 +83,7 @@ class CommentController extends Controller
 
         // OTORISASI: Hanya pemilik komentar yang bisa menghapus
         if ($comment->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk menghapus komentar ini!');
+            throw new HttpException(403);
         }
 
         // Hapus gambar lampiran komentar jika ada

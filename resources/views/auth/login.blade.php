@@ -19,7 +19,7 @@
                     <!-- Email (Blank) -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-white">Email</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="nama@email.com" required autocomplete="off">
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="nama@email.com" autocomplete="off">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -28,7 +28,7 @@
                     <!-- Password (Blank) -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-white">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" autocomplete="new-password">
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
