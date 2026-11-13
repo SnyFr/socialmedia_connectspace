@@ -1,90 +1,93 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConnectSpace - Media Sosial Internal</title>
+    <title>ConnectSpace</title>
 
-    <!-- Bootstrap 5 CSS CDN -->
+    <!-- Bootstrap 5 CSS & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Custom Styling Theme (X / Threads Inspired - Slate & Dark Mode) -->
     <style>
         :root {
-            --bg-main: #09090b;
-            /* Hitam charcoal khas Laravel Welcome Dark */
-            --bg-surface: #18181b;
-            /* Warna card (Zinc 900) */
-            --bg-input: #121215;
-            /* Warna input & box komentar */
-            --accent-color: #FF2D20;
-            /* Merah ikonik Laravel */
-            --accent-hover: #dc2626;
-            /* Merah lebih gelap saat hover */
+            --bg-main: #09090b;          /* Charcoal Dark khas Laravel */
+            --bg-surface: #18181b;       /* Warna card (Zinc 900) */
+            --bg-input: #121215;         /* Warna input & box komentar */
+            --accent-color: #FF2D20;     /* Merah ikonik Laravel */
+            --accent-hover: #dc2626;     /* Merah lebih gelap saat hover */
             --text-main: #f4f4f5;
             --text-muted: #a1a1aa;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
         }
 
-        /* Sidebar & Topbar */
-        .sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding: 1.5rem 1rem;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: #0c0c0e;
+        /* Top Navbar */
+        .navbar-custom {
+            background-color: rgba(12, 12, 14, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .sidebar-brand {
-            font-size: 1.25rem;
+        .navbar-brand-custom {
+            color: var(--accent-color) !important;
             font-weight: 800;
-            color: var(--accent-color);
-            text-decoration: none;
-            padding: 0.5rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            letter-spacing: -0.5px;
+            transition: opacity 0.2s ease;
         }
 
-        .nav-link-custom {
+        .navbar-brand-custom:hover {
+            opacity: 0.85;
+        }
+
+        /* Hilangkan panah bawaan dropdown pada avatar */
+        .avatar-dropdown-toggle::after {
+            display: none !important;
+        }
+
+        .avatar-trigger {
+            padding: 3px;
+            border-radius: 50px;
+            transition: background-color 0.2s ease;
+        }
+
+        .avatar-trigger:hover {
+            background-color: rgba(255, 45, 32, 0.12);
+        }
+
+        /* Dropdown Menu Dark */
+        .dropdown-menu-custom {
+            background-color: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            min-width: 230px;
+        }
+
+        .dropdown-menu-custom .dropdown-item {
             color: var(--text-main);
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 0.75rem 1rem;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            margin-bottom: 0.35rem;
-            white-space: nowrap;
+            border-radius: 8px;
+            margin: 0 6px;
+            width: calc(100% - 12px);
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
 
-        .nav-link-custom:hover {
-            background-color: rgba(255, 45, 32, 0.1);
-            color: var(--accent-color);
+        .dropdown-menu-custom .dropdown-item:hover {
+            background-color: rgba(255, 45, 32, 0.12);
+            color: #ffffff;
         }
 
-        .nav-link-custom.active {
-            background-color: rgba(255, 45, 32, 0.15);
-            color: var(--accent-color);
+        .dropdown-menu-custom .dropdown-item.text-danger:hover {
+            background-color: rgba(255, 45, 32, 0.18);
+            color: #ff554a !important;
         }
 
         /* Card & Form Surface */
@@ -136,233 +139,222 @@
             color: var(--text-muted) !important;
         }
 
-        /* Override Otomatis Class Biru (text-info & inline dark blue) Tanpa Edit File Lain */
         .text-info {
             color: var(--accent-color) !important;
         }
 
-        [style*="background-color: #0b1120"] {
-            background-color: #0c0c0e !important;
-        }
-
-        [style*="background-color: #0f172a"],
-        [style*="background-color: #090d16"] {
-            background-color: var(--bg-input) !important;
-        }
-
-        /* Responsif Tablet / Laptop Kecil */
-        @media (min-width: 768px) and (max-width: 1199.98px) {
-            .sidebar-brand {
-                font-size: 1.1rem;
-                gap: 0.4rem;
-                padding: 0.5rem 0.25rem;
-            }
-
-            .nav-link-custom {
-                font-size: 0.95rem;
-                padding: 0.6rem 0.75rem;
-                gap: 0.5rem;
-            }
+        .cursor-pointer {
+            cursor: pointer;
         }
     </style>
 </head>
-
 <body>
 
+    <!-- NAVBAR UTAMA (Tampil saat sudah login) -->
     @auth
-        <!-- LAYOUT TERPISAH DENGAN SIDEBAR UNTUK USER LOGIN  -->
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Sidebar Kiri -->
-                <div class="col-md-3 col-lg-3 col-xl-2 p-0 d-none d-md-block">
-                    <aside class="sidebar">
-                        <div>
-                            <!-- Brand / Logo -->
-                            <a href="{{ route('feed.index') }}" class="sidebar-brand">
-                                <i class="bi bi-strava"></i>
-                                <span>ConnectSpace</span>
+        <nav class="navbar navbar-dark navbar-custom sticky-top py-2">
+            <div class="container" style="max-width: 860px;">
+                
+                <!-- MARGIN START: Logo Strava + ConnectSpace (Klik ke Feed) -->
+                <a href="{{ route('feed.index') }}" class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0">
+                    <i class="bi bi-strava fs-3"></i>
+                    <span class="fs-5">ConnectSpace</span>
+                </a>
+
+                <!-- MARGIN END: Foto Profil + Dropdown Menu -->
+                <div class="dropdown ms-auto">
+                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle avatar-dropdown-toggle avatar-trigger" 
+                       id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline text-light fw-semibold small ps-2">{{ Auth::user()->name }}</span>
+                        <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}" 
+                             alt="{{ Auth::user()->name }}"
+                             class="rounded-circle border border-secondary border-opacity-50" 
+                             width="38" height="38" style="width: 38px; height: 38px; object-fit: cover;">
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark dropdown-menu-custom shadow-lg mt-2 py-2" aria-labelledby="userProfileDropdown">
+                        <!-- Info Akun -->
+                        <li class="px-3 py-2 border-bottom border-secondary border-opacity-25 mb-1">
+                            <div class="fw-bold text-white small">{{ Auth::user()->name }}</div>
+                            <div class="text-muted-custom text-break" style="font-size: 0.75rem;">{{ Auth::user()->email }}</div>
+                        </li>
+
+                        <!-- 1. Edit Profil -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 small fw-semibold" href="{{ route('profile.edit') }}">
+                                <i class="bi bi-person-gear text-info fs-6"></i>
+                                <span>Edit Profil</span>
                             </a>
+                        </li>
 
-                            <!-- Menu Navigasi -->
-                            <nav>
-                                <a href="{{ route('feed.index') }}"
-                                    class="nav-link-custom {{ request()->routeIs('feed.index') ? 'active' : '' }}">
-                                    <i class="bi bi-house-door-fill fs-4"></i>
-                                    <span>Beranda</span>
-                                </a>
-                                <a href="{{ route('profile.edit') }}"
-                                    class="nav-link-custom {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-                                    <i class="bi bi-person-fill fs-4"></i>
-                                    <span>Profil Saya</span>
-                                </a>
-                            </nav>
-                        </div>
+                        <!-- 2. Ubah Password -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 small fw-semibold" href="{{ route('profile.edit') }}#ubah-password">
+                                <i class="bi bi-shield-lock text-info fs-6"></i>
+                                <span>Ubah Password</span>
+                            </a>
+                        </li>
 
-                        <!-- Profil User & Tombol Logout di Bawah Sidebar -->
-                        <div class="pt-3 border-top border-secondary">
-                            <div class="d-flex align-items-center justify-content-between mb-3 px-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
-                                        class="rounded-circle border border-secondary" width="40" height="40"
-                                        style="object-fit: cover;" alt="Avatar">
-                                    <div class="lh-1">
-                                        <div class="fw-bold text-white mb-1">{{ Auth::user()->name }}</div>
-                                        <small class="text-muted-custom text-break">{{ Auth::user()->email }}</small>
-                                    </div>
-                                </div>
-                            </div>
+                        <li><hr class="dropdown-divider border-secondary border-opacity-25 my-1"></li>
 
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill btn-sm fw-bold">
-                                    <i class="bi bi-box-arrow-right me-1"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </aside>
+                        <!-- 3. Logout -->
+                        <li>
+                            <button type="button" 
+                                    class="dropdown-item d-flex align-items-center gap-2 py-2 small fw-semibold text-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#logoutConfirmModal">
+                                <i class="bi bi-box-arrow-right fs-6"></i>
+                                <span>Logout</span>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- TOPBAR NAVIGATION (Khusus Mode Mobile / Responsive) -->
-                <nav class="navbar navbar-dark d-md-none border-bottom border-secondary border-opacity-25 px-3 py-2 sticky-top"
-                    style="background-color: #0b1120;">
-                    <div class="container-fluid p-0 d-flex justify-content-between align-items-center">
+            </div>
+        </nav>
+    @endauth
 
-                        <!-- 1. Judul & Logo ConnectSpace (Bisa Diklik -> Ke Feed Beranda) -->
-                        <a href="{{ route('feed.index') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                            <i class="bi bi-strava text-info fs-4"></i>
-                            <span class="fw-bold text-info fs-5 mb-0" style="letter-spacing: -0.5px;">ConnectSpace</span>
-                        </a>
+    <!-- KONTEN UTAMA -->
+    <main class="container py-4" style="max-width: 860px;">
+        <!-- Alert Success -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background-color: #14532d; color: #dcfce7;">
+                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
-                        <!-- Menu Kanan: Foto Profil & Tombol Logout -->
-                        <div class="d-flex align-items-center gap-2">
+        <!-- Alert Error -->
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background-color: #7f1d1d; color: #fee2e2;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
-                            <!-- 2. Avatar Profil (Bisa Diklik -> Ke Edit Profil) -->
-                            <a href="{{ route('profile.edit') }}" title="Profil Saya"
-                                class="d-flex align-items-center text-decoration-none">
-                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FF2D20&color=ffffff' }}"
-                                    class="rounded-circle border border-secondary border-opacity-25" width="35"
-                                    height="35" style="object-fit: cover;">
-                            </a>
+        @yield('content')
+    </main>
 
-                            <!-- 3. Tombol Logout (Bulat Presisi & Sejajar) -->
-                            <form action="{{ route('logout') }}" method="POST" class="m-0">
-                                @csrf
-                                <button type="submit"
-                                    class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center p-0 rounded-circle"
-                                    style="width: 35px; height: 35px;" title="Logout">
-                                    <i class="bi bi-box-arrow-right fs-6"></i>
-                                </button>
-                            </form>
-                        </div>
-
+    <!-- ALERT CARD MODAL KONFIRMASI HAPUS (Global & Reusable) -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border border-secondary border-opacity-25 shadow-lg rounded-4" style="background-color: #18181b;">
+                <div class="modal-body p-4 text-center">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" 
+                         style="width: 56px; height: 56px; background-color: rgba(255, 45, 32, 0.12); color: #FF2D20;">
+                        <i class="bi bi-trash3-fill fs-4"></i>
                     </div>
-                </nav>
 
-                <!-- Area Konten Utama (Feed / Profile Edit) -->
-                <main class="col-md-9 col-lg-9 col-xl-8 py-4 px-md-4">
-                    <!-- Alert Notifikasi Sukses -->
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show bg-success text-white border-0 shadow-sm"
-                            role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+                    <h5 class="fw-bold text-white mb-2">Konfirmasi Hapus</h5>
+                    <p id="deleteModalMessage" class="text-muted-custom small mb-4">
+                        Yakin ingin menghapus data ini?
+                    </p>
 
-                    <!-- Alert Notifikasi Error -->
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show bg-danger text-white border-0 shadow-sm"
-                            role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    <!-- Tempat Konten disuntikkan -->
-                    @yield('content')
-                </main>
+                    <form id="deleteConfirmForm" method="POST" class="d-flex gap-2">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="btn btn-outline-secondary rounded-pill w-50 fw-semibold" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-accent rounded-pill w-50">
+                            Ya, Hapus
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    @else
-        <!-- LAYOUT TERPUSAT UNTUK TAMU / LOGIN / REGISTER -->
-        <main class="py-5">
-            <div class="container">
-                <!-- Alert Notifikasi -->
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show bg-success text-white border-0 shadow-sm"
-                        role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+    </div>
 
-                @yield('content')
+    <!-- ALERT CARD MODAL KONFIRMASI LOGOUT -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border border-secondary border-opacity-25 shadow-lg rounded-4" style="background-color: #18181b;">
+                <div class="modal-body p-4 text-center">
+                    <!-- Ikon Logout Merah Laravel -->
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" 
+                         style="width: 56px; height: 56px; background-color: rgba(255, 45, 32, 0.12); color: #FF2D20;">
+                        <i class="bi bi-box-arrow-right fs-4"></i>
+                    </div>
+
+                    <!-- Judul & Pesan -->
+                    <h5 class="fw-bold text-white mb-2">Konfirmasi Logout</h5>
+                    <p class="text-muted-custom small mb-4">
+                        Yakin ingin keluar dari akun ConnectSpace Anda?
+                    </p>
+
+                    <!-- Form Eksekusi Logout (Tetap memakai POST & @csrf) -->
+                    <form action="{{ route('logout') }}" method="POST" class="d-flex gap-2 m-0">
+                        @csrf
+                        <button type="button" class="btn btn-outline-secondary rounded-pill w-50 fw-semibold" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-accent rounded-pill w-50">
+                            Ya, Logout
+                        </button>
+                    </form>
+                </div>
             </div>
-        </main>
-    @endauth
+        </div>
+    </div>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Script Kontrol Alert Card Delete, Auto-Dismiss Alert, & Scroll Restoration -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.alert').forEach(function (alert) {
-                window.setTimeout(function () {
-                    bootstrap.Alert.getOrCreateInstance(alert).close();
-                }, 2000);
-            });
-        });
+        function openDeleteModal(deleteUrl, message) {
+            const deleteForm = document.getElementById('deleteConfirmForm');
+            const modalMessage = document.getElementById('deleteModalMessage');
 
-    // 1. Matikan scroll restoration bawaan browser agar tidak loncat/flicker saat reload
+            deleteForm.action = deleteUrl;
+            modalMessage.innerText = message;
+
+            const deleteModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        }
+
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
 
-        // 2. Tangkap posisi scroll persis saat form disubmit
         document.addEventListener('submit', function (e) {
             const form = e.target;
             const actionPath = new URL(form.action).pathname;
             const spoofedMethod = form.querySelector('input[name="_method"]')?.value?.toUpperCase();
             const actualMethod = spoofedMethod || form.method.toUpperCase();
 
-            // Cek apakah aksi ini adalah membuat POSTINGAN BARU (POST murni ke /posts)
             const isNewPost = (actionPath === '/posts' && actualMethod === 'POST');
 
             if (isNewPost) {
-                // Jika posting status baru, biarkan layar kembali ke paling atas
                 sessionStorage.removeItem('scrollPosition');
             } else {
-                // Untuk Like, Komentar, Edit, dan Hapus: simpan titik scroll layar saat ini
-                sessionStorage.setItem('scrollPosition', JSON.stringify({
-                    path: window.location.pathname,
-                    y: window.scrollY
-                }));
+                sessionStorage.setItem('scrollPosition', window.scrollY);
             }
         });
 
-        // 3. Kembalikan posisi scroll secara instan tanpa mengarahkan ke card tertentu
         document.addEventListener('DOMContentLoaded', function () {
+            // Auto-dismiss alert success dalam 3 detik
+            const successAlert = document.querySelector('.alert-success');
+            if (successAlert) {
+                setTimeout(function () {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(successAlert);
+                    bsAlert.close();
+                }, 3000);
+            }
+
+            // Kembalikan posisi scroll setelah reload
             const savedScroll = sessionStorage.getItem('scrollPosition');
             if (savedScroll !== null) {
+                const targetY = parseInt(savedScroll, 10);
                 sessionStorage.removeItem('scrollPosition');
-                const position = JSON.parse(savedScroll);
-                if (position.path !== window.location.pathname || !Number.isFinite(position.y)) {
-                    return;
-                }
 
-                const targetY = position.y;
-
-                // Pindahkan layar langsung ke koordinat semula sebelum user melihat kedipan
                 window.scrollTo({ top: targetY, behavior: 'instant' });
 
-                // Kunci ulang setelah gambar selesai dimuat agar tinggi gambar tidak menggeser posisi scroll
                 window.addEventListener('load', function () {
                     window.scrollTo({ top: targetY, behavior: 'instant' });
                 }, { once: true });
             }
-
         });
     </script>
 </body>
-
 </html>

@@ -71,7 +71,7 @@
             </div>
 
             <!-- Form 2: Ubah Password -->
-            <div class="card shadow-sm text-white">
+            <div class="card shadow-sm text-white" id="ubah-password">
                 <div class="card-header border-secondary py-3">
                     <h5 class="card-title mb-0 fw-bold fs-6">Ubah Kata Sandi (Password)</h5>
                 </div>
