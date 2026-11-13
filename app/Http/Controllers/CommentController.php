@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\CommentLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -11,13 +12,28 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class CommentController extends Controller
 {
     // Memproses Tambah Komentar
-    public function store(Request $request,int $postId)
+    public function store(Request $request, int $postId)
     {
-        // Validasi: Teks komentar atau Gambar lampiran wajib ada
         $request->validate([
-            'comment' => 'required_without:image|nullable|string',
-            'image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'parent_id' => 'nullable|integer|exists:comments,id',
+            'comment'   => 'required_without:image|nullable|string',
+            'location'  => 'nullable|string|max:100',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ], [
+            'comment.required_without' => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
         ]);
+
+        // Simpan parent_id sesuai komentar/balasan spesifik yang dibalas (mendukung nested bertingkat)
+        $parentId = null;
+        if ($request->filled('parent_id')) {
+            $parentComment = Comment::where('id', $request->input('parent_id'))
+                ->where('post_id', $postId)
+                ->first();
+
+            if ($parentComment) {
+                $parentId = $parentComment->id;
+            }
+        }
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -25,29 +41,31 @@ class CommentController extends Controller
         }
 
         Comment::create([
-            'post_id' => $postId,
-            'user_id' => Auth::id(),
-            'comment' => $request->comment,
-            'image'   => $imagePath,
+            'post_id'   => $postId,
+            'parent_id' => $parentId,
+            'user_id'   => Auth::id(),
+            'comment'   => $request->input('comment'),
+            'location'  => $request->input('location'),
+            'image'     => $imagePath,
         ]);
 
-        return redirect()->to(url()->previous() . '#post-' . $postId);
+        return back()->with('success', $parentId ? 'Balasan terkirim!' : 'Komentar terkirim!');
     }
 
     public function update(Request $request, string $id)
     {
         $comment = Comment::findOrFail($id);
 
-        // 1. OTORISASI: Hanya pemilik komentar yang bisa mengedit
         if ($comment->user_id !== Auth::id()) {
-            throw new HttpException(403);
+            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengedit komentar ini!');
         }
 
         $hasExistingImage = $comment->image && !$request->boolean('remove_image');
 
         $request->validate([
-            'comment' => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string',
-            'image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'comment'  => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string',
+            'location' => 'nullable|string|max:100',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
             'comment.required_without' => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
         ]);
@@ -69,11 +87,31 @@ class CommentController extends Controller
         }
 
         $comment->update([
-            'comment' => $request->input('comment'),
-            'image'   => $imagePath,
+            'comment'  => $request->input('comment'),
+            'image'    => $imagePath,
         ]);
 
         return back()->with('success', 'Komentar berhasil diperbarui!');
+    }
+
+    public function toggleLike(string $id)
+    {
+        $comment = Comment::findOrFail($id);
+
+        $existing = CommentLike::where('user_id', Auth::id())
+            ->where('comment_id', $comment->id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+        } else {
+            CommentLike::create([
+                'user_id'    => Auth::id(),
+                'comment_id' => $comment->id,
+            ]);
+        }
+
+        return back();
     }
 
     // Memproses Hapus Komentar (Hanya Pemilik Komentar)

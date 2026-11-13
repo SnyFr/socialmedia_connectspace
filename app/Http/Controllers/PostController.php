@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\SavedPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,13 +14,8 @@ class PostController extends Controller
     // 1. Menampilkan Feed Beranda
     public function index()
     {
-        // Ambil postingan terbaru (latest = created_at DESC)
-        // Eager Loading (with) digunakan untuk mencegah masalah N+1 Query
-        $posts = Post::with(['user', 'comments.user'])
-            ->withCount(['likes', 'comments'])
-            ->withExists([
-                'likes as liked_by_user' => fn ($query) => $query->where('user_id', Auth::id()),
-            ])
+        $posts = Post::with(['user', 'likes', 'savedPosts', 'comments.user', 'comments.likes', 'comments.replies.user',
+    'comments.replies.likes',])
             ->latest()
             ->get();
 
@@ -31,7 +27,7 @@ class PostController extends Controller
     {
         // Validasi: Teks ATAU Gambar wajib ada (required_without)
         $request->validate([
-            'content' => 'required_without:image|nullable|string',
+            'content' => 'required_without:image|nullable|string|max:500',
             'image'   => 'required_without:content|nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
             'content.required_without' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
@@ -69,10 +65,11 @@ class PostController extends Controller
         $hasExistingImage = $post->image && !$request->boolean('remove_image');
 
         $request->validate([
-            'content' => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string',
+            'content' => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string|max:500',
             'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
             'content.required_without' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
+            'content.max'              => 'Konten postingan maksimal 500 karakter.',
             'image.max'                => 'Ukuran gambar maksimal 2MB.',
         ]);
 
@@ -101,6 +98,27 @@ class PostController extends Controller
         ]);
 
         return back()->with('success', 'Postingan berhasil diupdate!');
+    }
+
+    public function toggleSave(string $id)
+    {
+        $post = Post::findOrFail($id);
+
+        $existing = SavedPost::where('user_id', Auth::id())
+            ->where('post_id', $post->id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            return back()->with('success', 'Postingan dihapus dari daftar tersimpan.');
+        }
+
+        SavedPost::create([
+            'user_id' => Auth::id(),
+            'post_id' => $post->id,
+        ]);
+
+        return back()->with('success', 'Postingan disimpan ke tab Post Tersimpan!');
     }
 
     // 3. Memproses Hapus Status (Otorisasi Pemilik)

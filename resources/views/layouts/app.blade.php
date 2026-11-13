@@ -179,6 +179,14 @@
                             <div class="text-muted-custom text-break" style="font-size: 0.75rem;">{{ Auth::user()->email }}</div>
                         </li>
 
+                        <!-- Profil Saya (Postingan & Post Tersimpan) -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 small fw-semibold" href="{{ route('users.show', Auth::id()) }}">
+                                <i class="bi bi-person-circle text-info fs-6"></i>
+                                <span>Profil Saya</span>
+                            </a>
+                        </li>
+
                         <!-- 1. Edit Profil -->
                         <li>
                             <a class="dropdown-item d-flex align-items-center gap-2 py-2 small fw-semibold" href="{{ route('profile.edit') }}">
@@ -333,6 +341,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
+            detectUserLocation();
             // Auto-dismiss alert success dalam 3 detik
             const successAlert = document.querySelector('.alert-success');
             if (successAlert) {
@@ -353,6 +362,232 @@
                 window.addEventListener('load', function () {
                     window.scrollTo({ top: targetY, behavior: 'instant' });
                 }, { once: true });
+            }
+        });
+
+        // 1. Validasi Live Max 500 Karakter & Disable Tombol Posting
+        function validatePostLength(textarea, counterId, warningId, submitBtnId) {
+            const maxChars = 500;
+            const currentLength = textarea.value.length;
+            const counter = document.getElementById(counterId);
+            const warning = document.getElementById(warningId);
+            const submitBtn = document.getElementById(submitBtnId);
+
+            if (counter) {
+                counter.innerText = `${currentLength} / ${maxChars}`;
+            }
+
+            if (currentLength > maxChars) {
+                textarea.classList.add('border-danger');
+                if (counter) {
+                    counter.classList.remove('text-muted-custom');
+                    counter.classList.add('text-danger', 'fw-bold');
+                }
+                if (warning) warning.classList.remove('d-none');
+                if (submitBtn) submitBtn.disabled = true;
+            } else {
+                textarea.classList.remove('border-danger');
+                if (counter) {
+                    counter.classList.add('text-muted-custom');
+                    counter.classList.remove('text-danger', 'fw-bold');
+                }
+                if (warning) warning.classList.add('d-none');
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }
+
+        // 2. Preview Gambar Post Status Baru
+        function previewPostImage(event) {
+            const input = event.target;
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('postImagePreview');
+            const fileName = document.getElementById('fileName');
+
+            if (input.files && input.files[0]) {
+                preview.src = URL.createObjectURL(input.files[0]);
+                container.classList.remove('d-none');
+                if (fileName) fileName.innerText = input.files[0].name;
+            }
+        }
+
+        function removePostImage() {
+            const input = document.getElementById('postImageInput');
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('postImagePreview');
+            const fileName = document.getElementById('fileName');
+
+            input.value = '';
+            preview.src = '';
+            container.classList.add('d-none');
+            if (fileName) fileName.innerText = '';
+        }
+
+        // 3. Toggle Input Lokasi Komentar
+        function applyDetectedLocation(locationText) {
+            if (!locationText) return;
+            document.querySelectorAll('.auto-comment-location').forEach(function (input) {
+                input.value = locationText;
+            });
+        }
+
+        const LOCAL_CITIES = [
+            { name: 'Jakarta, Indonesia',    minLat: -6.375, maxLat: -6.080, minLng: 106.680, maxLng: 106.975 },
+            { name: 'Depok, Indonesia',      minLat: -6.465, maxLat: -6.350, minLng: 106.730, maxLng: 106.910 },
+            { name: 'Tangerang, Indonesia',  minLat: -6.360, maxLat: -6.080, minLng: 106.520, maxLng: 106.750 },
+            { name: 'Bekasi, Indonesia',     minLat: -6.430, maxLat: -6.150, minLng: 106.930, maxLng: 107.180 },
+            { name: 'Bogor, Indonesia',      minLat: -6.680, maxLat: -6.500, minLng: 106.730, maxLng: 106.860 },
+            { name: 'Bandung, Indonesia',    minLat: -6.970, maxLat: -6.840, minLng: 107.540, maxLng: 107.740 },
+            { name: 'Semarang, Indonesia',   minLat: -7.120, maxLat: -6.930, minLng: 110.270, maxLng: 110.500 },
+            { name: 'Yogyakarta, Indonesia', minLat: -7.840, maxLat: -7.760, minLng: 110.340, maxLng: 110.410 },
+            { name: 'Surabaya, Indonesia',   minLat: -7.360, maxLat: -7.190, minLng: 112.600, maxLng: 112.830 },
+            { name: 'Medan, Indonesia',      minLat: 3.450,  maxLat: 3.790,  minLng: 98.560,  maxLng: 98.740  },
+            { name: 'Denpasar, Indonesia',   minLat: -8.750, maxLat: -8.600, minLng: 115.170, maxLng: 115.270 }
+        ];
+
+        function resolveLocationFromCoords(lat, lng) {
+            // 1. Cek apakah latitude & longitude masuk dalam batas area kota
+            const matchedCity = LOCAL_CITIES.find(city =>
+                lat >= city.minLat && lat <= city.maxLat &&
+                lng >= city.minLng && lng <= city.maxLng
+            );
+
+            if (matchedCity) {
+                return matchedCity.name;
+            }
+
+            // 2. Jika di luar daftar kota di atas, tampilkan titik koordinat (4 angka di belakang koma)
+            return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+
+        function detectUserLocation() {
+            // Bersihkan cache dari percobaan API sebelumnya
+            sessionStorage.removeItem('user_gps_location');
+            sessionStorage.removeItem('user_gps_location_v2');
+            sessionStorage.removeItem('user_detected_location');
+
+            const cachedCoordsLocation = sessionStorage.getItem('user_offline_coords_location');
+            if (cachedCoordsLocation) {
+                applyDetectedLocation(cachedCoordsLocation);
+                return;
+            }
+
+            if (!('geolocation' in navigator)) {
+                console.warn('Browser tidak mendukung Geolocation.');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const { latitude, longitude } = position.coords;
+                    const locationText = resolveLocationFromCoords(latitude, longitude);
+
+                    sessionStorage.setItem('user_offline_coords_location', locationText);
+                    applyDetectedLocation(locationText);
+                },
+                function (error) {
+                    console.warn('Akses lokasi ditolak atau gagal:', error.message);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        // 4. Preview Gambar Komentar
+        function previewCommentImage(event, uniqueId) {
+            const input = event.target;
+            const container = document.getElementById(`commentPreviewContainer-${uniqueId}`);
+            const preview = document.getElementById(`commentPreviewImg-${uniqueId}`);
+
+            if (input.files && input.files[0]) {
+                preview.src = URL.createObjectURL(input.files[0]);
+                container.classList.remove('d-none');
+            }
+        }
+
+        function removeCommentImage(uniqueId) {
+            const input = document.getElementById(`commentImageInput-${uniqueId}`);
+            const container = document.getElementById(`commentPreviewContainer-${uniqueId}`);
+            const preview = document.getElementById(`commentPreviewImg-${uniqueId}`);
+
+            input.value = '';
+            preview.src = '';
+            container.classList.add('d-none');
+        }
+
+        // Toggle Form Reply Komentar + Auto-Mention jika membalas sesama balasan
+        // Toggle Buka / Tutup Daftar Balasan ("Lihat balasan (X)" <-> "Sembunyikan balasan")
+        function toggleReplies(uniqueKey, forceOpen = false) {
+            const container = document.getElementById(`repliesContainer-${uniqueKey}`);
+            const btn = document.getElementById(`toggleRepliesBtn-${uniqueKey}`);
+            const textEl = document.getElementById(`toggleRepliesText-${uniqueKey}`);
+            const iconEl = document.getElementById(`toggleRepliesIcon-${uniqueKey}`);
+
+            if (!container || !btn) return;
+
+            const count = btn.getAttribute('data-count');
+            const shouldOpen = forceOpen ? true : container.classList.contains('d-none');
+
+            if (shouldOpen) {
+                container.classList.remove('d-none');
+                if (textEl) textEl.innerText = 'Sembunyikan balasan';
+                if (iconEl) iconEl.className = 'bi bi-chevron-up';
+            } else {
+                container.classList.add('d-none');
+                if (textEl) textEl.innerText = `Lihat balasan (${count})`;
+                if (iconEl) iconEl.className = 'bi bi-chevron-down';
+            }
+        }
+
+        // Toggle Form Reply Komentar
+        function toggleReplyForm(uniqueKey) {
+            const container = document.getElementById(`replyFormContainer-${uniqueKey}`);
+            const input = document.getElementById(`replyInput-${uniqueKey}`);
+
+            if (!container || !input) return;
+
+            container.classList.toggle('d-none');
+            if (!container.classList.contains('d-none')) {
+                input.focus();
+            }
+        }
+
+        // Simpan jejak thread yang sedang dibalas agar otomatis terbuka setelah reload
+        document.addEventListener('submit', function (e) {
+            if (e.target.classList.contains('nested-reply-form')) {
+                const openKeys = [];
+                let currentWrapper = e.target.closest('.replies-wrapper');
+
+                // Telusuri seluruh induk thread di atasnya
+                while (currentWrapper) {
+                    const key = currentWrapper.id.replace('repliesContainer-', '');
+                    openKeys.push(key);
+                    currentWrapper = currentWrapper.parentElement.closest('.replies-wrapper');
+                }
+
+                // Tambahkan key komentar yang baru saja dibalas
+                const targetKey = e.target.getAttribute('data-parent-key');
+                if (targetKey) openKeys.push(targetKey);
+
+                sessionStorage.setItem('autoOpenReplyThreads', JSON.stringify(openKeys));
+            }
+        });
+
+        // Buka kembali thread balasan secara otomatis setelah halaman reload
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedThreads = sessionStorage.getItem('autoOpenReplyThreads');
+            if (savedThreads) {
+                sessionStorage.removeItem('autoOpenReplyThreads');
+                try {
+                    const keys = JSON.parse(savedThreads);
+                    keys.forEach(function (key) {
+                        toggleReplies(key, true);
+                    });
+                } catch (err) {
+                    console.warn(err);
+                }
             }
         });
     </script>

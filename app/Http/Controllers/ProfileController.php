@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +57,29 @@ class ProfileController extends Controller
         }
 
         return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function show(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Semua postingan milik user tersebut beserta komentar (sendiri & orang lain)
+        $posts = Post::with(['user', 'likes', 'savedPosts', 'comments.user', 'comments.likes', 'comments.replies.user',
+    'comments.replies.likes',])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        // Daftar post tersimpan khusus jika sedang membuka profil milik sendiri
+        $savedPosts = collect();
+        if (Auth::id() === $user->id) {
+            $savedPosts = $user->savedPosts()
+                ->with(['user', 'likes', 'savedPosts', 'comments.user', 'comments.likes'])
+                ->latest('saved_posts.created_at')
+                ->get();
+        }
+
+        return view('users.show', compact('user', 'posts', 'savedPosts'));
     }
 
     // 3. Memproses Perubahan Password dengan Verifikasi Password Lama

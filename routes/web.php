@@ -28,14 +28,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('/posts/{id}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('/posts/{id}/save', [PostController::class, 'toggleSave'])->name('posts.save');
     
     // Komentar dan Like
     Route::post('/posts/{id}/like', [LikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update'); 
     Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy'); 
+    Route::post('/comments/{id}/like', [CommentController::class, 'toggleLike'])->name('comments.like');
 
     // Route Profil
+    Route::get('/users/{id}', [ProfileController::class, 'show'])->name('users.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
