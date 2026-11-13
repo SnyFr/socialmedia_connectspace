@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-6 col-lg-5">
+<div class="row justify-content-center align-items-center" style="min-height: 82vh;">
+    <div class="col-12" style="max-width: 460px;">
         <div class="card shadow-lg border border-secondary border-opacity-25">
             <!-- Header Card -->
             <div class="card-header border-secondary border-opacity-25 text-center py-4">
-                <i class="bi bi-person-plus-fill text-info fs-1 mb-2 d-block"></i>
-                <h4 class="mb-0 fw-bold text-white">Daftar Akun ConnectSpace</h4>
+                <i class="bi bi-strava text-info fs-1 mb-2 d-block"></i>
+                <h4 class="mb-1 fw-bold text-white">Daftar Akun ConnectSpace</h4>
                 <small class="text-muted-custom">Buat akun baru untuk bergabung di media sosial internal</small>
             </div>
 
@@ -19,34 +19,34 @@
                     <!-- Nama Lengkap -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-white">Nama Lengkap</label>
-                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Masukkan nama lengkap">
+                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Alamat Email (Blank) -->
+                    <!-- Alamat Email -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-white">Alamat Email</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="nama@email.com" autocomplete="off">
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="nama@email.com" required autocomplete="off">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Password (Blank) -->
+                    <!-- Password -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-white">Password (Min. 8 Karakter)</label>
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" autocomplete="new-password">
+                        <label class="form-label fw-semibold text-white">Password (Min. 6 Karakter)</label>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required autocomplete="new-password">
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Konfirmasi Password (Blank) -->
+                    <!-- Konfirmasi Password -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-white">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" autocomplete="new-password">
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required autocomplete="new-password">
                     </div>
 
                     <button type="submit" class="btn btn-accent w-100 py-2">Daftar Sekarang</button>
