@@ -54,12 +54,12 @@
                         <i class="bi bi-grid-3x3-gap me-1"></i> Postingan Saya ({{ $posts->count() }})
                     </button>
                 </li>
-                <li class="nav-item flex-fill" role="presentation">
+                {{-- <li class="nav-item flex-fill" role="presentation">
                     <button class="nav-link w-100 rounded-pill fw-semibold small text-white" 
                             id="saved-posts-tab" data-bs-toggle="pill" data-bs-target="#saved-posts-pane" type="button" role="tab">
                         <i class="bi bi-bookmark-fill me-1"></i> Post Tersimpan ({{ $savedPosts->count() }})
                     </button>
-                </li>
+                </li> --}}
             </ul>
 
             <style>
@@ -76,8 +76,8 @@
                         @include('partials.post-card', ['post' => $post, 'prefix' => 'own-'])
                     @empty
                         <div class="text-center py-5 text-muted-custom card">
-                            <i class="bi bi-pencil-square fs-1 d-block mb-2"></i>
-                            <p class="mb-0">Anda belum membuat postingan apa pun.</p>
+                            <i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>
+                            <p class="mb-0">Anda Belum punya Postingan nih!</p>
                         </div>
                     @endforelse
                 </div>

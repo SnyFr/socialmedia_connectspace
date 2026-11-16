@@ -29,14 +29,14 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        // Simpan data pengguna baru dengan enkripsi Hash (bcrypt)
+        // Simpan data (register) pengguna baru dengan enkripsi Hash
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // aktifkan sesi login (Auto-Login)
+        // Aktifkan sesi login (Auto-Login)
         Auth::login($user);
 
         // Redirect langsung ke Feed
@@ -61,14 +61,13 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             // Mencegah serangan Session Fixation
             $request->session()->regenerate();
-
             return redirect()->intended(route('feed.index'))->with('success', 'Login Sukses!');
         }
 
         // Jika kombinasi email & password salah
         return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-            'password' => 'Email atau password yang Anda masukkan salah.',
+            'email' => 'Email atau password yang dimasukkan salah.',
+            'password' => 'Email atau password yang dimasukkan salah.',
         ])->onlyInput('email', 'password');
     }
 
@@ -76,9 +75,8 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout(); // Hancurkan sesi login di Auth
-
-        $request->session()->invalidate(); // Batalkan sesi Laravel
-        $request->session()->regenerateToken(); // Buat ulang CSRF token baru
+        $request->session()->invalidate(); // Batalkan sesi dari Laravel
+        $request->session()->regenerateToken(); // Buat ulang token baru dari CSRF
 
         return redirect()->route('login')->with('success', 'Anda telah berhasil logout.');
     }

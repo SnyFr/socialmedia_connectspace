@@ -96,12 +96,12 @@
                 @php
                     $isSaved = $post->savedPosts->contains('user_id', Auth::id());
                 @endphp
-                <button type="submit"
+                {{-- <button type="submit"
                     class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 {{ $isSaved ? 'text-info' : 'text-muted-custom' }} fw-semibold small"
                     title="{{ $isSaved ? 'Hapus dari Tersimpan' : 'Simpan Postingan' }}">
                     <i class="bi {{ $isSaved ? 'bi-bookmark-fill' : 'bi-bookmark' }} fs-6"></i>
                     <span>{{ $isSaved ? 'Tersimpan' : 'Simpan' }}</span>
-                </button>
+                </button> --}}
             </form>
         </div>
 
@@ -135,6 +135,12 @@
 
                             <button class="btn btn-accent px-3 fw-bold" type="submit">Kirim</button>
                         </div>
+
+                        @if($errors->{'comment_' . $post->id}->any())
+                            <div class="text-danger small fw-semibold mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ $errors->{'comment_' . $post->id}->first() }}
+                            </div>
+                        @endif
 
                         <!-- Preview Gambar Komentar -->
                         <div id="commentPreviewContainer-{{ $prefix }}{{ $post->id }}"
@@ -203,22 +209,22 @@
                                 <small class="text-muted-custom d-block mb-2">Gambar saat ini:</small>
                                 <img src="{{ asset('storage/' . $post->image) }}" class="img-fluid rounded mb-2"
                                     style="max-height: 180px;">
-                                <div class="form-check">
+                                {{-- <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="remove_image"
                                         value="1" id="removePostImg-{{ $prefix }}{{ $post->id }}">
                                     <label class="form-check-label small text-danger"
                                         for="removePostImg-{{ $prefix }}{{ $post->id }}">
                                         Hapus gambar dari postingan
                                     </label>
-                                </div>
+                                </div> --}}
                             </div>
                         @endif
 
                         <div>
-                            <label
+                            {{-- <label
                                 class="form-label small fw-semibold">{{ $post->image ? 'Ganti Gambar Baru (Opsional)' : 'Tambah Gambar (Opsional)' }}</label>
                             <input type="file" name="image" class="form-control form-control-sm"
-                                accept="image/*">
+                                accept="image/*"> --}}
                         </div>
                     </div>
                     <div class="modal-footer border-secondary border-opacity-25">

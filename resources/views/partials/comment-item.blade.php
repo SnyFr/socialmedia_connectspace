@@ -3,6 +3,7 @@
     $replies = $allComments->where('parent_id', $comment->id)->sortBy('created_at');
     $replyCount = $replies->count();
     $uniqueKey = $prefix . $comment->id;
+    $hasReplyError = $errors->{'reply_' . $comment->id}->any();
 @endphp
 
 <div class="{{ $depth === 0 ? 'mb-2 p-2 rounded-3' : 'mt-2 pt-2 ps-2 ps-sm-3 border-start border-secondary border-opacity-25' }}"
@@ -27,9 +28,9 @@
                         {{ $comment->user->name }}
                     </a>
                     <small class="text-muted-custom" style="font-size: {{ $depth === 0 ? '0.72rem' : '0.7rem' }};">
-                        @if($comment->location)
+                        {{-- @if($comment->location)
                             {{ $comment->location }} <span class="mx-1">|</span>
-                        @endif
+                        @endif --}}
                         {{ $comment->created_at->diffForHumans() }}
                     </small>
                 </div>
@@ -111,7 +112,7 @@
             </div>
 
             <!-- FORM BALAS KOMENTAR INI (Hidden sampai tombol Balas diklik) -->
-            <div id="replyFormContainer-{{ $uniqueKey }}" class="mt-2 d-none">
+            <div id="replyFormContainer-{{ $uniqueKey }}" class="mt-2 {{ $hasReplyError ? '' : 'd-none' }}">
                 <form action="{{ route('comments.store', $post->id) }}" method="POST" enctype="multipart/form-data" class="nested-reply-form" data-parent-key="{{ $uniqueKey }}">
                     @csrf
                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">

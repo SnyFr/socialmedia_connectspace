@@ -24,7 +24,7 @@
                                     oninput="validatePostLength(this, 'createCharCount', 'createCharWarning', 'createPostSubmitBtn')">{{ old('content') }}</textarea>
 
                                 @error('content')
-                                    <div class="invalid-feedback d-block mb-1">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block mb-1">{{ $message }}</div> 
                                 @enderror
 
                                 <!-- Indikator Counter & Peringatan 500 Karakter -->
@@ -52,7 +52,7 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <label
                                             class="btn btn-sm btn-outline-secondary rounded-pill cursor-pointer border-opacity-25">
-                                            <i class="bi bi-image text-info me-1"></i> Lampirkan Gambar
+                                            <i class="bi bi-images text-info me-1"></i> Lampirkan Gambar
                                             <input type="file" name="image" id="postImageInput" class="d-none"
                                                 accept="image/*" onchange="previewPostImage(event)">
                                         </label>
@@ -62,6 +62,11 @@
                                     <button type="submit" id="createPostSubmitBtn"
                                         class="btn btn-accent px-4 py-1">Posting</button>
                                 </div>
+                                @error('image')
+                                    <div class="text-danger small fw-semibold mt-2">
+                                        <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                     </form>
@@ -73,8 +78,8 @@
                 @include('partials.post-card', ['post' => $post, 'prefix' => 'feed-'])
             @empty
                 <div class="text-center py-5 text-muted-custom">
-                    <i class="bi bi-chat-left-dots fs-1 d-block mb-2"></i>
-                    <p>Belum ada postingan. Jadilah yang pertama membuat status!</p>
+                    <i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>
+                    <p>Anda Belum punya Postingan nih! Jadilah yang pertama membuat status!</p>
                 </div>
             @endforelse
 

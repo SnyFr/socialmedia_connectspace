@@ -34,7 +34,7 @@
         /* Top Navbar */
         .navbar-custom {
             background-color: rgba(12, 12, 14, 0.92);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 

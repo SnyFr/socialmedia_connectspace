@@ -25,14 +25,19 @@ class PostController extends Controller
     // 2. Memproses Buat Status Baru
     public function store(Request $request)
     {
+        $hasImageInput = $request->hasFile('image') 
+        || (isset($_FILES['image']['error']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE);
         // Validasi: Teks ATAU Gambar wajib ada (required_without)
         $request->validate([
-            'content' => 'required_without:image|nullable|string|max:500',
-            'image'   => 'required_without:content|nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ], [
-            'content.required_without' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
-            'image.required_without'   => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
-            'image.max'                => 'Ukuran gambar maksimal 2MB.',
+            'content' => ($hasImageInput ? 'nullable' : 'required') . '|string|max:500',
+            'image'   => ($request->filled('content') ? 'nullable' : 'required') . '|image|mimes:jpeg,png,jpg,gif,webp|max:8192',
+            ], [
+                'content.required' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
+                'image.required'   => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
+                'image.image'      => 'File yang diunggah harus berupa gambar.',
+                'image.mimes'      => 'Format gambar harus jpeg, png, jpg, gif, atau webp.',
+                'image.max'        => 'Ukuran gambar maksimal 8MB.',
+                'image.uploaded'   => 'Ukuran gambar maksimal 8MB.',
         ]);
 
         $imagePath = null;
@@ -66,7 +71,7 @@ class PostController extends Controller
 
         $request->validate([
             'content' => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string|max:500',
-            'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:8192',
         ], [
             'content.required_without' => 'Postingan tidak boleh kosong! Isi teks atau unggah gambar.',
             'content.max'              => 'Konten postingan maksimal 500 karakter.',

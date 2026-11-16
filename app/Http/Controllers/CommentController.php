@@ -14,13 +14,26 @@ class CommentController extends Controller
     // Memproses Tambah Komentar
     public function store(Request $request, int $postId)
     {
-        $request->validate([
+        $hasImageInput = $request->hasFile('image')
+            || (isset($_FILES['image']['error']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE);
+
+        // error bag  dipisahkan antara komentar utama dan balasan agar tidak muncul di form postingan
+        $errorBag = $request->filled('parent_id')
+            ? 'reply_' . $request->input('parent_id')
+            : 'comment_' . $postId;
+
+        $request->validateWithBag($errorBag, [
             'parent_id' => 'nullable|integer|exists:comments,id',
-            'comment'   => 'required_without:image|nullable|string',
+            'comment'   => ($hasImageInput ? 'nullable' : 'required') . '|string',
             'location'  => 'nullable|string|max:100',
-            'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image'     => ($request->filled('comment') ? 'nullable' : 'required') . '|image|mimes:jpeg,png,jpg,gif,webp|max:8192',
         ], [
-            'comment.required_without' => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
+            'comment.required' => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
+            'image.required'   => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
+            'image.image'      => 'File komentar harus berupa gambar.',
+            'image.mimes'      => 'Format gambar komentar harus jpeg, png, jpg, gif, atau webp.',
+            'image.max'        => 'Ukuran gambar komentar maksimal 8MB.',
+            'image.uploaded'   => 'Ukuran gambar komentar maksimal 8MB.',
         ]);
 
         // Simpan parent_id sesuai komentar/balasan spesifik yang dibalas (mendukung nested bertingkat)
@@ -65,7 +78,7 @@ class CommentController extends Controller
         $request->validate([
             'comment'  => ($hasExistingImage ? 'nullable' : 'required_without:image') . '|string',
             'location' => 'nullable|string|max:100',
-            'image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:8192',
         ], [
             'comment.required_without' => 'Komentar tidak boleh kosong! Isi teks atau unggah gambar.',
         ]);

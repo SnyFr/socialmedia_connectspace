@@ -29,7 +29,7 @@ class ProfileController extends Controller
         [
             'name'   => 'required|string|max:100',
             'bio'    => 'nullable|string|max:500',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Maksimal 2MB
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192', // Maksimal 2MB
         ], 
         
         [

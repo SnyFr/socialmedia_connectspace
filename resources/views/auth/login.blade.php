@@ -7,7 +7,7 @@
             <!-- Header Card -->
             <div class="card-header border-secondary border-opacity-25 text-center py-4">
                 <i class="bi bi-strava text-info fs-1 mb-2 d-block"></i>
-                <h4 class="mb-1 fw-bold text-white">Login ConnectSpace</h4>
+                <h3 class="mb-1 fw-bold text-white">Login to ConnectSpace</h3>
                 <small class="text-muted-custom">Masukkan akun untuk masuk ke beranda</small>
             </div>
 
