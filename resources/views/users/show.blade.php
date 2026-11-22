@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $avatarUrl = $user->avatar
+        ? asset('storage/' . $user->avatar)
+        : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=FF2D20&color=ffffff';
+@endphp
+
 <div class="row justify-content-center">
     <div class="col-12">
 
@@ -9,10 +15,13 @@
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start justify-content-between gap-3">
                     <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 text-center text-sm-start">
-                        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=FF2D20&color=ffffff' }}" 
-                             alt="{{ $user->name }}"
-                             class="rounded-circle border border-secondary border-opacity-50 flex-shrink-0" 
-                             width="80" height="80" style="width: 80px; height: 80px; object-fit: cover;">
+                        <button type="button" class="btn p-0 border-0 bg-transparent rounded-circle flex-shrink-0"
+                                data-bs-toggle="modal" data-bs-target="#profileAvatarPreview"
+                                aria-label="Lihat foto profil {{ $user->name }}">
+                            <img src="{{ $avatarUrl }}" alt="{{ $user->name }}"
+                                 class="rounded-circle border border-secondary border-opacity-50"
+                                 width="80" height="80" style="width: 80px; height: 80px; object-fit: cover;">
+                        </button>
                         
                         <div>
                             <h4 class="fw-bold text-white mb-0">{{ $user->name }}</h4>
@@ -45,6 +54,25 @@
             </div>
         </div>
 
+        <div class="modal fade" id="profileAvatarPreview" tabindex="-1"
+             aria-labelledby="profileAvatarPreviewLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-light border border-secondary border-opacity-25"
+                     style="background-color: #18181b;">
+                    <div class="modal-header border-secondary border-opacity-25">
+                        <h5 class="modal-title fw-bold" id="profileAvatarPreviewLabel">{{ $user->name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="{{ $avatarUrl }}" alt="Foto profil {{ $user->name }}"
+                             class="rounded-circle border border-secondary border-opacity-50"
+                             style="width: min(100%, 360px); aspect-ratio: 1; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- JIKA PROFIL PEMILIK AKUN SENDIRI: TAMPILKAN TAB POSTINGAN & POST TERSIMPAN -->
         @if(Auth::id() === $user->id)
             <ul class="nav nav-pills mb-3 gap-2 p-1 rounded-pill border border-secondary border-opacity-25" style="background-color: #18181b;" id="profileTabs" role="tablist">
@@ -54,12 +82,12 @@
                         <i class="bi bi-grid-3x3-gap me-1"></i> Postingan Saya ({{ $posts->count() }})
                     </button>
                 </li>
-                {{-- <li class="nav-item flex-fill" role="presentation">
+                <li class="nav-item flex-fill" role="presentation">
                     <button class="nav-link w-100 rounded-pill fw-semibold small text-white" 
                             id="saved-posts-tab" data-bs-toggle="pill" data-bs-target="#saved-posts-pane" type="button" role="tab">
                         <i class="bi bi-bookmark-fill me-1"></i> Post Tersimpan ({{ $savedPosts->count() }})
                     </button>
-                </li> --}}
+                </li>
             </ul>
 
             <style>
